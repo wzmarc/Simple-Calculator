@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<style>
+			.counter {
+				width: 350px;
+				height: 550px;
+				background-color: #000000;
+				border: 1px solid #C2C3C6;
+				margin: 50px auto;
+			}
+			
+			.showbox {
+				width: 350px;
+				height: 75px;
+				background-color: #000000;
+				box-sizing: border-box;
+				margin: 20px auto;
+				border: none;
+				font: 700 55px/70px "微软雅黑";
+                color: #ffffff;
+				text-align: right;
+				padding-right: 30px;
+			}
+			
+			.funckey {
+				cursor: pointer;
+				margin: 5px;
+				width: 70px;
+				height: 70px;
+				background-color: #C2C3C6;
+				border-radius: 50%;
+			}
+			
+			.funckey:hover {
+				background-color: aquamarine;
+			}
+			
+			.funckey:active {
+				position:relative;
+				top:1px;
+			}
+			
+			.numkey {
+				cursor: pointer;
+				margin: 5px;
+				width: 70px;
+				height: 70px;
+				background-color: #444444;
+				border-radius: 50%;
+				color: white;
+			}
+			
+			.numkey:hover {
+				background-color: aquamarine;
+			}
+			
+			.numkey:active {
+				position:relative;
+				top:1px;
+			}
+			
+			.mathkey {
+				cursor: pointer;
+				margin: 5px;
+				width: 70px;
+				height: 70px;
+				background-color: orange;
+				border-radius: 50%;
+				color: white;
+			}
+			
+			.mathkey:hover {
+				background-color: aquamarine;
+			}
+			
+			.mathkey:active {
+				position:relative;
+				top:1px;
+			}
+			
+		</style>
+		<title></title>
+		<script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+	</head>
+	<body>
+		<div class="counter">
+			<div class="showbox" id="calc-display">0</div>
+			<table cellspacing="10px">
+				<tr style="">
+					<td class="funckey" style="text-align:center;"
+						onclick="helpfunc('AC')">AC</td>
+					<td class="funckey" style="text-align:center;"
+						onclick="helpfunc('+/-')">+/-</td>
+					<td class="funckey" style="text-align:center;"
+						onclick="helpfunc('%')">%</td>
+					<td class="mathkey" style="text-align:center;"
+						onclick="mathfunc('/')">
+						&divide;
+					</td>
+				</tr>
+				<tr>
+					<td class="numkey" style="text-align:center;"
+						onclick="showfunc('7')">7</td>
+					<td class="numkey" style="text-align:center;"
+						onclick="showfunc('8')">8</td>
+					<td class="numkey" style="text-align:center;"
+						onclick="showfunc('9')">9</td>
+					<td class="mathkey" style="text-align:center;"
+						onclick="mathfunc('*')">
+						&times;
+					</td>
+				</tr>
+				<tr>
+					<td class="numkey" style="text-align:center;"
+						onclick="showfunc('4')">4</td>
+					<td class="numkey" style="text-align:center;"
+						onclick="showfunc('5')">5</td>
+					<td class="numkey" style="text-align:center;"
+						onclick="showfunc('6')">6</td>
+					<td class="mathkey" style="text-align:center;"
+						onclick="mathfunc('-')">
+						&minus;
+					</td>
+				</tr>
+				<tr>
+					<td class="numkey" style="text-align:center;"
+						onclick="showfunc('1')">1</td>
+					<td class="numkey" style="text-align:center;"
+						onclick="showfunc('2')">2</td>
+					<td class="numkey" style="text-align:center;"
+						onclick="showfunc('3')">3</td>
+					<td class="mathkey" style="text-align:center;"
+						onclick="mathfunc('+')">
+						&plus;
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" class="numkey" style="border-radius:50px;text-align:10px;
+					text-align:center;" onclick="showfunc('0')">0</td>
+					<td class="numkey" style="text-align:center;" 
+						onclick="showfunc('.')">.</td>
+					<td class="numkey" style="text-align:center;" 
+						onclick="finalcalfunc()">=</td>
+				</tr>
+			</table>
+		</div>
+	</body>
+	<script>
+		var prev_val = 0;
+		var new_val = 0;
+		var mid_val = 0;
+		var math_prev = '';
+		var math_clicked = false;
+		var math_time = 0;
+		var math_init = true;
+		var math_start = false;
+		var dot_num = 0;
+		
+		function initfunc() {
+			prev_val = 0;
+			new_val = 0;
+			mid_val = 0;
+			math_clicked = false;
+			math_prev = '+';
+			math_time = 0;
+			math_init = true;
+			dot_num = 0;
+		}
+		
+		function showfunc(new_digit) {
+			if (math_clicked || math_start) {
+				dot_num = 0;
+				if (new_digit == '.') {
+					dot_num += 1;
+					if (dot_num > 1) {
+						alert("警告： 不合理输入！！");	
+					}
+					$(".showbox").html('0.');
+				} else {
+					$(".showbox").html(new_digit);
+				}
+				math_clicked = false;
+				math_start = false;
+			} else {
+				var cur_val = $(".showbox").html();
+				if (cur_val == '0') {
+					if (new_digit == '.') {
+						dot_num += 1;
+						$(".showbox").html('0.');
+					} else {
+						$(".showbox").html(new_digit);
+					}
+				} else {
+					if (new_digit == '.') {
+						dot_num += 1;
+						if (dot_num > 1) {
+							alert("警告： 不合理输入！！");
+							$(".showbox").html(cur_val);
+						} else {
+							$(".showbox").html((cur_val) + new_digit);
+						}
+					} else {
+						$(".showbox").html((cur_val) + new_digit);
+					}
+				}
+			}
+		}
+		
+		function helpfunc(op) {
+			if (op == 'AC') {
+				$(".showbox").html(0);
+				initfunc();
+			}
+			if (op == '+/-') {
+				var cur_val = $(".showbox").html();
+				$(".showbox").html(0 - cur_val);
+			}
+			if (op == '%') {
+				var cur_val = $(".showbox").html();
+				$(".showbox").html(cur_val / 100)
+			}	
+		}
+		
+		function mathfunc(op) {
+			math_time += 1;
+			
+			if (math_init == false) {
+				prev_val = midcalfunc(math_prev, prev_val);
+				$(".showbox").html(prev_val);
+			} else {
+				prev_val = $(".showbox").html();
+			}
+			math_prev = op;
+			math_clicked = true;
+			math_init = false;
+		}
+		
+		function midcalfunc(math_prev, prev_val) {
+			new_val = $(".showbox").html();
+			switch(math_prev) {
+				case "+":
+					mid_val = Number(prev_val) + Number(new_val);
+					break;
+				case "-":
+					mid_val = Number(prev_val) - Number(new_val);
+					break;
+				case "*":
+					mid_val = Number(prev_val) * Number(new_val);
+					break;
+				case "/":
+					if (new_val == 0) {
+						alert("警告：分子不能为 0");
+						initfunc()
+						break;
+					}
+					mid_val = Number(prev_val) / Number(new_val);
+					break;
+			}
+			return mid_val;
+		}
+		 
+		function finalcalfunc() {
+			new_val = $(".showbox").html();
+			if (math_prev == '+') {
+				$(".showbox").html(Number(prev_val) + Number(new_val));
+			}
+			if (math_prev == '-') {
+				$(".showbox").html(Number(prev_val) - Number(new_val));
+			}
+			if (math_prev == '*') {
+				$(".showbox").html(Number(prev_val) * Number(new_val));
+			}
+			if (math_prev == '/') {
+				if (new_val == 0) {
+					alert("警告：分子不能为 0");
+					$(".showbox").html(0);
+					initfunc()
+				} else {
+					$(".showbox").html(Number(prev_val) / Number(new_val));
+				}
+			}
+			initfunc();
+			math_start = true;
+		}	
+	</script>
+</html>
